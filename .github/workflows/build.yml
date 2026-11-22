@@ -37,23 +37,19 @@ jobs:
           fi
           rsync -a --exclude='.github/' "$PROJECT_DIR/" ./
 
-      - name: Force Java and Kotlin 17
+      - name: Build APK
         run: |
-          cat >> app/build.gradle <<'EOF'
-
-          android {
-              compileOptions {
-                  sourceCompatibility JavaVersion.VERSION_17
-                  targetCompatibility JavaVersion.VERSION_17
+          cat > /tmp/force-java17.gradle <<'EOF'
+          allprojects {
+            afterEvaluate {
+              tasks.withType(org.gradle.api.tasks.compile.JavaCompile).configureEach {
+                sourceCompatibility = '17'
+                targetCompatibility = '17'
               }
-              kotlinOptions {
-                  jvmTarget = "17"
-              }
+            }
           }
           EOF
-
-      - name: Build APK
-        run: gradle --no-daemon assembleDebug
+          gradle --init-script /tmp/force-java17.gradle --no-daemon assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
