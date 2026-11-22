@@ -30,7 +30,7 @@ jobs:
           unzip -q ZalFinance_Android_Starter.zip -d /tmp/zf
           rsync -a --exclude='.github/' /tmp/zf/ZalFinance/ ./
 
-            - name: Build APK
+                  - name: Build APK
         run: |
           sed -i 's/VERSION_1_8/VERSION_17/g' app/build.gradle
           sed -i 's/jvmTarget = "1.8"/jvmTarget = "17"/g' app/build.gradle
