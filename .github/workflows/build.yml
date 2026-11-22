@@ -32,26 +32,25 @@ jobs:
           unzip -q ZalFinance_Android_Starter.zip -d /tmp/zf
           PROJECT_DIR=$(find /tmp/zf -type f \( -name settings.gradle -o -name settings.gradle.kts \) -print -quit | xargs -r dirname)
           if [ -z "$PROJECT_DIR" ]; then
-            echo "ERROR: Android project not found in ZIP"
-            find /tmp/zf -maxdepth 5 -type f | head -100
+            echo "Android project not found"
             exit 1
           fi
-          echo "Project found: $PROJECT_DIR"
           rsync -a --exclude='.github/' "$PROJECT_DIR/" ./
 
-      - name: Set JVM target to 17
+      - name: Force Java and Kotlin 17
         run: |
-          find . -name build.gradle -o -name build.gradle.kts
-          if [ -f app/build.gradle ]; then
-            sed -i 's/VERSION_1_8/VERSION_17/g' app/build.gradle
-            sed -i 's/jvmTarget = "1.8"/jvmTarget = "17"/g' app/build.gradle
-          elif [ -f app/build.gradle.kts ]; then
-            sed -i 's/JVM_1_8/JVM_17/g' app/build.gradle.kts
-            sed -i 's/"1.8"/"17"/g' app/build.gradle.kts
-          else
-            echo "ERROR: app/build.gradle not found"
-            exit 1
-          fi
+          cat >> app/build.gradle <<'EOF'
+
+          android {
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+              kotlinOptions {
+                  jvmTarget = "17"
+              }
+          }
+          EOF
 
       - name: Build APK
         run: gradle --no-daemon assembleDebug
