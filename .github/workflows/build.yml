@@ -28,7 +28,7 @@ jobs:
       - name: Extract project
         run: |
           unzip -q ZalFinance_Android_Starter.zip -d /tmp/zf
-          cp -R /tmp/zf/ZalFinance/. .
+          rsync -a --exclude='.github/' /tmp/zf/ZalFinance/ ./
 
       - name: Build APK
         run: gradle --no-daemon assembleDebug
